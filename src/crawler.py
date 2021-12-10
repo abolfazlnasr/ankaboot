@@ -4,11 +4,19 @@ from bs4 import BeautifulSoup
 
 
 def crawl(url: str) -> list:
+    """
+    Get page text
+    Remove numbers
+    Remove citations
+    Remove special characters
+    Replace half-space with space
+    """
     page = requests.get(url)
     soup = BeautifulSoup(page.text, "html.parser")
     page_text = soup.getText()
-    page_text = regex.sub(r"\[[\u06F0-\u06F90-9]*]", "", page_text)  # Remove citations
-    page_text = regex.sub(r"[\u0021-\u007f•«»↑▼.،٪–]", " ", page_text)  # Remove special characters
-    page_text = regex.sub(r"[\u200c\u200f\ufeff]", " ", page_text)  # Replace half-space with space
+    page_text = regex.sub(r"[۰-۹0-9]", "", page_text)
+    page_text = regex.sub(r"\[[\u06F0-\u06F90-9]*]", "", page_text)
+    page_text = regex.sub(r"[\u0021-\u0040\u005b-\u0060\u007b-\u007f•«»↑▼.،٪–]", "",page_text)
+    page_text = regex.sub(r"[\u200c\u200f\ufeff]", " ", page_text)
     page_words = page_text.split()
     return page_words

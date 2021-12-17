@@ -3,7 +3,7 @@ import re as regex
 from bs4 import BeautifulSoup
 
 
-def crawl(url: str) -> list:
+def crawl(url: str) -> str:
     """
     Get page text
     Remove numbers
@@ -16,7 +16,6 @@ def crawl(url: str) -> list:
     page_text = soup.getText()
     page_text = regex.sub(r"[۰-۹0-9]", "", page_text)
     page_text = regex.sub(r"\[[\u06F0-\u06F90-9]*]", "", page_text)
-    page_text = regex.sub(r"[\u0021-\u0040\u005b-\u0060\u007b-\u007f•«»↑▼.،٪–]", "",page_text)
+    page_text = regex.sub(r"[\u0021-\u0040\u005b-\u0060\u007b-\u007f•«»↑▼.،٪–]", "", page_text)
     page_text = regex.sub(r"[\u200c\u200f\ufeff]", " ", page_text)
-    page_words = page_text.split()
-    return page_words
+    return page_text

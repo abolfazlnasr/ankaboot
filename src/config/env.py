@@ -6,8 +6,6 @@ class Environments(BaseSettings):
     app_title: str = 'Application Name'
 
     # postgres environment variables
-    min_conn: int = 1
-    max_conn: int = 1
     db_name: str = 'postgresql'
     db_host: str = '127.0.0.1'
     db_port: str = '5432'

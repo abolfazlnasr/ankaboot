@@ -1,42 +1,71 @@
-from crawler import crawl
 from fastapi import FastAPI
+from utils.crawler import crawl
 from starlette.responses import FileResponse
-from word_cloud import create_wordcloud_from_text
-from keyword_extractor import keywords_using_keybert, keywords_using_yake
+from utils.similar_pages import find_similar_pages
+from utils.word_cloud import create_wordcloud_from_text
+from connections.database_connection import get_connection
+from utils.keyword_extractor import keywords_using_keybert, keywords_using_yake, keywords_using_tfidf
 
-extracted_words = []
-default_url = "https://fa.wikipedia.org/wiki/%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86" \
-              "%D9%88%DB%8C%D8%B3%DB%8C_%D8%B1%D8%A7%DB%8C%D8%A7%D9%86%D9%87%E2%80%8C%D8%A7%DB%8C "
+
+crawled_text = ""
+crawled_url = ""
 
 app = FastAPI()
 
 
-@app.get("/")
-def index():
-    return extracted_words
+def save_to_db(url, text, yake=[], keybert=[], tfidf=[]):
+    with get_connection() as (cursor, conn):
+        stmt = """
+        select * from crawled_pages
+        where url like %s
+        """
+        cursor.execute(stmt, (url,))
+        result = cursor.fetchone()
+        if result:
+            stmt = """
+            update crawled_pages
+            set tfidf_kw = %s
+            where url like %s
+            """
+            cursor.execute(stmt, (list(tfidf), url))
+            conn.commit()
+        else:
+            stmt = """
+            insert into crawled_pages (url, text, yake_kw, keybert_kw, tfidf_kw)
+            values (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(stmt, (url, text, yake, keybert, tfidf))
+            conn.commit()
 
-
-@app.post("/crawl")
-def crawl_page(url=default_url):
-    global extracted_words
-    extracted_words = crawl(url)
     return True
 
 
 @app.get("/word_cloud")
-def show_word_cloud():
-    text = " ".join(extracted_words)
-    create_wordcloud_from_text(text)
+def get_word_cloud():
+    create_wordcloud_from_text(crawled_text)
     return FileResponse("img/result.png")
 
 
-@app.get("/keybert")
-def show_keywords_using_keybert():
-    text = " ".join(extracted_words)
-    return keywords_using_keybert(text)
+@app.post("/api")
+def index(method: str, url: str):
+    global crawled_text, crawled_url
+    crawled_url = url
+    crawled_text = crawl(url)
+    kws = []
 
+    if method == "tfidf":
+        kws = keywords_using_tfidf(crawled_text)
+        save_to_db(url, crawled_text, [], [], kws)
 
-@app.get("/yake")
-def show_keywords_using_yake():
-    text = " ".join(extracted_words)
-    return keywords_using_yake(text)
+    elif method == "yake":
+        kws = keywords_using_yake(crawled_text)
+        save_to_db(url, crawled_text, kws)
+
+    elif method == "keybert":
+        kws = keywords_using_keybert(crawled_text)()
+        save_to_db(url, crawled_text, [], kws)
+
+    return {
+        "keywords": kws,
+        "similar_pages": find_similar_pages(kws)
+    }

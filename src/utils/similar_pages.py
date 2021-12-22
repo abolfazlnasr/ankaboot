@@ -20,5 +20,5 @@ def find_similar_pages(keywords: list):
         for result in results:
             jaccard_score = jaccard_similarity(keywords, result['keywords'])
             if 0.05 < jaccard_score < 1:
-                jaccard_scores.append([result['url'], jaccard_score])
+                jaccard_scores.append(result['url'])
         return sorted(jaccard_scores, key=lambda score: score[1], reverse=True)[:3]

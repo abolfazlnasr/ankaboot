@@ -3,7 +3,7 @@ from pydantic import BaseSettings
 
 class Environments(BaseSettings):
     debug: bool = True
-    app_title: str = 'Application Name'
+    app_title: str = 'ankaboot'
 
     # postgres environment variables
     db_name: str = 'postgresql'

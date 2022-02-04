@@ -1,7 +1,9 @@
+import uvicorn
 from fastapi import FastAPI
 from utils.crawler import crawl
 from starlette.responses import FileResponse
 from utils.similar_pages import find_similar_pages
+from starlette.middleware.cors import CORSMiddleware
 from utils.word_cloud import create_wordcloud_from_text
 from connections.database_connection import get_connection
 from utils.keyword_extractor import keywords_using_keybert, keywords_using_yake, keywords_using_tfidf
@@ -11,6 +13,12 @@ crawled_text = ""
 crawled_url = ""
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_methods=['*'],
+    allow_headers=['*']
+)
 
 
 def save_to_db(url, text, yake=[], keybert=[], tfidf=[]):
@@ -69,3 +77,7 @@ def index(method: str, url: str):
         "keywords": kws,
         "similar_pages": find_similar_pages(kws)
     }
+
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', host='0.0.0.0', port=8000)

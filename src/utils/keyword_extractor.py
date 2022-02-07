@@ -1,13 +1,14 @@
 import yake
 import math
 import hazm
+from utils.models import DF
 from keybert import KeyBERT
-from connections.database_connection import get_connection
 
 
 def keywords_using_keybert(text: str):
     keywords = []
-    kw_extractor = KeyBERT('distilbert-base-nli-mean-tokens')
+    # kw_extractor = KeyBERT('distilbert-base-nli-mean-tokens')
+    kw_extractor = KeyBERT()
     for kw in kw_extractor.extract_keywords(text, keyphrase_ngram_range=(1, 1), stop_words=[]):
         keywords.append(kw[0])
     return keywords
@@ -15,7 +16,7 @@ def keywords_using_keybert(text: str):
 
 def keywords_using_yake(text: str):
     keywords = []
-    kw_extractor = yake.KeywordExtractor()
+    kw_extractor = yake.KeywordExtractor(n=1)
     for kw in kw_extractor.extract_keywords(text):
         keywords.append(kw[0])
     return keywords
@@ -23,22 +24,15 @@ def keywords_using_yake(text: str):
 
 def get_idf(word: str):
     df = 1
-    with get_connection() as (cursor, conn):
-        stmt = """
-        select df, docs_count
-        from df_models
-        order by id desc
-        limit 1
-        """
-        cursor.execute(stmt)
-        result = cursor.fetchone()
-        df_model = result['df']
-        docs_count = result['docs_count']
 
-        if word in df_model.items():
-            df += df_model[word]
+    df_data = DF.get_df()
+    df_model = df_data['df_model']
+    docs_count = df_data['docs_count']
 
-        return math.log(docs_count / df)
+    if word in df_model.items():
+        df += df_model[word]
+
+    return math.log(docs_count / df)
 
 
 def keywords_using_tfidf(text: str):

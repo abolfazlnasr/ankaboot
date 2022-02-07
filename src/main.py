@@ -8,7 +8,6 @@ from utils.word_cloud import create_wordcloud_from_text
 from connections.database_connection import get_connection
 from utils.keyword_extractor import keywords_using_keybert, keywords_using_yake, keywords_using_tfidf
 
-
 crawled_text = ""
 crawled_url = ""
 
@@ -54,24 +53,44 @@ def get_word_cloud():
     return FileResponse("img/result.png")
 
 
-@app.post("/api")
-def index(method: str, url: str):
+@app.post("/api/tfidf")
+def index_tfidf(url: str):
     global crawled_text, crawled_url
     crawled_url = url
     crawled_text = crawl(url)
-    kws = []
 
-    if method == "tfidf":
-        kws = keywords_using_tfidf(crawled_text)
-        save_to_db(url, crawled_text, [], [], kws)
+    kws = keywords_using_tfidf(crawled_text)
+    save_to_db(url, crawled_text, [], [], kws)
 
-    elif method == "yake":
-        kws = keywords_using_yake(crawled_text)
-        save_to_db(url, crawled_text, kws)
+    return {
+        "keywords": kws,
+        "similar_pages": find_similar_pages(kws)
+    }
 
-    elif method == "keybert":
-        kws = keywords_using_keybert(crawled_text)()
-        save_to_db(url, crawled_text, [], kws)
+
+@app.post("/api/keybert")
+def index_keyebrt(url: str):
+    global crawled_text, crawled_url
+    crawled_url = url
+    crawled_text = crawl(url)
+
+    kws = keywords_using_keybert(crawled_text)
+    save_to_db(url, crawled_text, [], kws)
+
+    return {
+        "keywords": kws,
+        "similar_pages": find_similar_pages(kws)
+    }
+
+
+@app.post("/api/yake")
+def index(url: str):
+    global crawled_text, crawled_url
+    crawled_url = url
+    crawled_text = crawl(url)
+
+    kws = keywords_using_yake(crawled_text)
+    save_to_db(url, crawled_text, kws)
 
     return {
         "keywords": kws,

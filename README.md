@@ -1,2 +1,4 @@
-# ankaboot
-crawl a page and get some useful textual analysis
+# Ankaboot
+![spider](spider.png)
+
+crawl web pages and get some useful textual analysis

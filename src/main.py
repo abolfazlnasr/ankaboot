@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from utils.crawler import crawl
+from utils.summarizer import summarize_text
 from starlette.responses import FileResponse
 from utils.similar_pages import find_similar_pages
 from starlette.middleware.cors import CORSMiddleware
@@ -64,7 +65,8 @@ def index_tfidf(url: str):
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws)
+        "similar_pages": find_similar_pages(kws),
+        "summary": summarize_text(crawled_text)
     }
 
 
@@ -79,7 +81,8 @@ def index_keyebrt(url: str):
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws)
+        "similar_pages": find_similar_pages(kws),
+        "summary": summarize_text(crawled_text)
     }
 
 
@@ -94,7 +97,8 @@ def index(url: str):
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws)
+        "similar_pages": find_similar_pages(kws),
+        "summary": summarize_text(crawled_text)
     }
 
 

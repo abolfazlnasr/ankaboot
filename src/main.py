@@ -1,4 +1,5 @@
 import uvicorn
+from typing import List
 from fastapi import FastAPI
 from utils.crawler import crawl
 from utils.summarizer import summarize_text
@@ -7,6 +8,7 @@ from utils.similar_pages import find_similar_pages
 from starlette.middleware.cors import CORSMiddleware
 from utils.word_cloud import create_wordcloud_from_text
 from connections.database_connection import get_connection
+from utils.similarity_graph import similarity_matrix, network_graph
 from utils.keyword_extractor import keywords_using_keybert, keywords_using_yake, keywords_using_tfidf
 
 crawled_text = ""
@@ -52,6 +54,14 @@ def save_to_db(url, text, yake=[], keybert=[], tfidf=[]):
 def get_word_cloud():
     create_wordcloud_from_text(crawled_text)
     return FileResponse("img/result.png")
+
+
+@app.post("/similarity_graph")
+def get_similarity_graph(urls: List[str]):
+    pages = {url: crawl(url) for url in urls}
+    network_graph(similarity_matrix(pages))
+
+    return FileResponse("img/graph.png")
 
 
 @app.post("/api/tfidf")

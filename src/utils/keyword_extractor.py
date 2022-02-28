@@ -38,6 +38,7 @@ def get_idf(word: str):
 def keywords_using_tfidf(text: str):
     words_dict = {}
     words = [word.lower() for word in hazm.word_tokenize(text) if len(word) > 1]
+    words = [word for word in words if word not in hazm.stopwords_list()]
 
     for word in words:
         if word in words_dict:

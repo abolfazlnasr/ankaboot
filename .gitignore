@@ -2,5 +2,5 @@ __pycache__
 /env
 /.idea
 /.vscode
-img/result.png
-img/graph.png
+/src/img/graph.png
+/src/img/result.png

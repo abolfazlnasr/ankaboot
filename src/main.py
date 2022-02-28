@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from typing import List
 from fastapi import FastAPI
@@ -56,12 +57,18 @@ def get_word_cloud():
     return FileResponse("img/result.png")
 
 
-@app.post("/similarity_graph")
+@app.get("/similarity_graph")
+def get_word_cloud():
+    return FileResponse("img/graph.png")
+
+
+@app.post("/api/similarity_graph")
 def get_similarity_graph(urls: List[str]):
     pages = {url: crawl(url) for url in urls}
     network_graph(similarity_matrix(pages))
+    pages.clear()
 
-    return FileResponse("img/graph.png")
+    return True
 
 
 @app.post("/api/tfidf")

@@ -1,8 +1,7 @@
 from heapq import nlargest
-from hazm import stopwords_list
 from collections import defaultdict
 from nltk.probability import FreqDist
-from nltk.tokenize import sent_tokenize, word_tokenize
+from hazm import stopwords_list, sent_tokenize, word_tokenize
 
 
 def summarize_text(text: str):

@@ -15,8 +15,10 @@ def similarity_matrix(pages: dict) -> dict:
             if i != j:
                 jaccard_score = jaccard_similarity(kws_list[i], kws_list[j])
                 if 0.05 < jaccard_score < 1:
-                    sims.append(urls[j])
-        matrix[url] = sims
+                    # sims.append(urls[j])
+                    sims.append(j)
+        # matrix[url] = sims
+        matrix[i] = sims
 
     return matrix
 

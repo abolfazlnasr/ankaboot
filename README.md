@@ -1,4 +1,6 @@
 # Ankaboot
 ![spider](src/img/spider.png)
 
-crawl web pages and get some useful textual analysis
+Ankaboot means spider.
+
+It crawls web pages and give some useful textual analysis.

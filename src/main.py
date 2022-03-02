@@ -78,11 +78,11 @@ def index_tfidf(url: str):
     crawled_text = crawl(url)
 
     kws = keywords_using_tfidf(crawled_text)
-    save_to_db(url, crawled_text, [], [], kws)
+    # save_to_db(url, crawled_text, [], [], kws)
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws),
+        # "similar_pages": find_similar_pages(kws),
         "summary": summarize_text(crawled_text)
     }
 
@@ -94,11 +94,11 @@ def index_keyebrt(url: str):
     crawled_text = crawl(url)
 
     kws = keywords_using_keybert(crawled_text)
-    save_to_db(url, crawled_text, [], kws)
+    # save_to_db(url, crawled_text, [], kws)
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws),
+        # "similar_pages": find_similar_pages(kws),
         "summary": summarize_text(crawled_text)
     }
 
@@ -110,11 +110,11 @@ def index(url: str):
     crawled_text = crawl(url)
 
     kws = keywords_using_yake(crawled_text)
-    save_to_db(url, crawled_text, kws)
+    # save_to_db(url, crawled_text, kws)
 
     return {
         "keywords": kws,
-        "similar_pages": find_similar_pages(kws),
+        # "similar_pages": find_similar_pages(kws),
         "summary": summarize_text(crawled_text)
     }
 
